@@ -327,6 +327,11 @@ int vfs_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
 }
 EXPORT_SYMBOL_GPL(vfs_fallocate);
 
+#ifdef CONFIG_KSU_MANUAL_HOOK
+extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
+                                int *flags);
+#endif
+
 int ksys_fallocate(int fd, int mode, loff_t offset, loff_t len)
 {
 	struct fd f = fdget(fd);
@@ -413,8 +418,12 @@ static long do_faccessat(int dfd, const char __user *filename, int mode, int fla
 	unsigned int lookup_flags = LOOKUP_FOLLOW;
 	const struct cred *old_cred = NULL;
 
+#ifdef CONFIG_KSU_MANUAL_HOOK
+	ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
+#endif
 #ifdef CONFIG_KSU_SUSFS_SUS_SU
 	if (likely(susfs_is_current_proc_umounted())) {
+
 		goto orig_flow;
 	}
 	if (likely(susfs_is_sus_su_hooks_enabled) &&
