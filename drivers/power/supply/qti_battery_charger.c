@@ -2534,6 +2534,10 @@ static void screen_state_for_charge_callback(enum panel_event_notifier_tag notif
 			default:
 				return;
 		}
+		if (write_property_id(bcdev, &bcdev->psy_list[PSY_TYPE_XM],
+				      XM_PROP_BLANK_STATUS,
+				      blank_state) < 0)
+			pr_err("%s blank state notify fail\n", __func__);
 		printk(KERN_ERR "%s, primary blank_state = %d\n", __func__, blank_state);
 		if (!bcdev->support_soc_update || bcdev->support_screen_update)
 			schedule_work(&bcdev->notify_blankstate_work);
