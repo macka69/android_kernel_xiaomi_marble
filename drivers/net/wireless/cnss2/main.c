@@ -1721,6 +1721,9 @@ static int cnss_do_recovery(struct cnss_plat_data *plat_priv,
 			clear_bit(CNSS_DRIVER_RECOVERY,
 				  &plat_priv->driver_state);
 			return 0;
+		} else {
+			cnss_pr_err("PCI link down recovery failed. Force self recovery\n");
+			goto self_recovery;
 		}
 		break;
 	case CNSS_REASON_RDDM:
